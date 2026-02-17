@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+    <title>Student Hub · complete dashboard</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4faff;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: #0b263b;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            padding: 28px 16px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 28px 10px;
+            border-bottom: 1px solid #254a64;
+            margin-bottom: 24px;
+        }
+
+        .logo-area i {
+            font-size: 28px;
+            color: #9ac7ff;
+        }
+
+        .logo-area span {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .sidebar-menu li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            margin: 6px 0;
+            border-radius: 14px;
+            color: #cbdbea;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .sidebar-menu li i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: #9db9d6;
+        }
+
+        .sidebar-menu li.active {
+            background: #1e4970;
+            color: white;
+            border-left: 4px solid #6ab0f0;
+        }
+
+        .sidebar-menu li:not(.active):hover {
+            background: #1a3a52;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 28px 35px;
+            background: #f8fcff;
+        }
+
+        /* top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 28px;
+            border-radius: 26px;
+            margin-bottom: 30px;
+            border: 1px solid #e2effa;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .greeting h1 {
+            font-size: 24px;
+            font-weight: 650;
+            color: #174267;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .greeting .date-badge {
+            background: #e8f0fe;
+            color: #1e5a85;
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+            font-size: 22px;
+            color: #2c628b;
+            cursor: pointer;
+        }
+
+        .notification-icon .badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: #e1554d;
+            color: white;
+            font-size: 11px;
+            padding: 3px 7px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #fef3f0;
+            color: #b34545;
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #fcdbd2;
+        }
+
+        /* ===== WIDGET GRID ===== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 26px;
+            margin-bottom: 30px;
+        }
+
+        /* card style */
+        .card {
+            background: white;
+            border-radius: 26px;
+            padding: 22px 24px;
+            border: 1px solid #e4eefa;
+            box-shadow: 0 8px 18px rgba(0,20,40,0.02);
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 24px rgba(20,60,100,0.06);
+            border-color: #cde0f2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d4d73;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header .badge {
+            background: #e5f0fe;
+            color: #1a6bb0;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* stats row */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1b5480;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #5f7f9c;
+        }
+
+        /* course list */
+        .course-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eef5fc;
+        }
+
+        .course-item:last-child {
+            border-bottom: none;
+        }
+
+        .course-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 4px;
+            margin-right: 14px;
+        }
+
+        .course-info {
+            flex: 1;
+        }
+
+        .course-title {
+            font-weight: 600;
+            color: #1d4b70;
+        }
+
+        .course-meta {
+            font-size: 13px;
+            color: #698aa8;
+        }
+
+        .course-grade {
+            font-weight: 700;
+            color: #1d7a54;
+        }
+
+        /* upcoming list */
+        .upcoming-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eef5fc;
+        }
+
+        .upcoming-icon {
+            width: 38px;
+            height: 38px;
+            background: #e9f2fc;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2b6fa5;
+        }
+
+        .upcoming-details {
+            flex: 1;
+        }
+
+        .upcoming-title {
+            font-weight: 600;
+            color: #1d4b70;
+        }
+
+        .upcoming-time {
+            font-size: 13px;
+            color: #6b8ba8;
+        }
+
+        .upcoming-badge {
+            background: #fdefe0;
+            color: #b9571c;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* chart container */
+        .chart-container {
+            height: 160px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        /* quick actions */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            background: #f2f9ff;
+            border: 1px solid #d9e9f7;
+            border-radius: 18px;
+            padding: 14px 0;
+            text-align: center;
+            color: #1d5d8c;
+            transition: 0.15s;
+            cursor: pointer;
+        }
+
+        .action-btn i {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .action-btn span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: #e1effb;
+            border-color: #aecae4;
+        }
+
+        /* timetable mini */
+        .timetable-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f6fd;
+        }
+
+        .timetable-time {
+            width: 65px;
+            font-weight: 600;
+            color: #1d5380;
+            font-size: 14px;
+        }
+
+        .timetable-subject {
+            flex: 1;
+            font-weight: 500;
+            color: #1f4460;
+        }
+
+        .timetable-room {
+            color: #6484a3;
+            font-size: 13px;
+        }
+
+        /* responsive */
+        @media (max-width: 950px) {
+            .sidebar { width: 220px; }
+            .main-content { margin-left: 220px; padding: 25px; }
+        }
+
+        @media (max-width: 700px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 16px;
+            }
+            .sidebar-menu { display: flex; flex-wrap: wrap; }
+            .sidebar-menu li { padding: 10px 16px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #1e4e6f;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .toast.show { opacity: 1; }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo-area">
+        <i class="fas fa-graduation-cap"></i>
+        <span>StudentHub</span>
+    </div>
+    <ul class="sidebar-menu">
+        <li class="active"><i class="fas fa-home"></i> Dashboard</li>
+        <a href="result.html"><li><i class="fas fa-chart-bar" style="text-decoration: none; color: inherit;"></i> Result</li> </a>
+        <li><i class="fas fa-school"></i> <a href="ai-js-chart.html" style="text-decoration: none; color: inherit;">View Semester</a></li>
+         <a href="course.html" style="text-decoration: none; color: inherit;"><li><i class="fas fa-book-open"></i> Courses</li> </a>
+       <a href="notification-ai.html" style="text-decoration: none; color: inherit;"> <li><i class="fas fa-bell"></i> Notifications</li> </a>
+        <a href="profile.html" style="text-decoration: none; color: inherit;"><li><i class="fas fa-user"></i> Profile</li> </a>
+    </ul>
+</div>
+
+<div class="main-content">
+    <!-- top bar -->
+    <div class="top-bar">
+        <div class="greeting">
+            <h1>
+                Welcome back, Adamu 👋
+                <span class="date-badge"><i class="far fa-calendar"></i> Feb 14, 2026</span>
+            </h1>
+        </div>
+        <div class="user-actions">
+           <a href="notification-ai.html" style="text-decoration: none; color: inherit;"> <div class="notification-icon" onclick="showToast('3 new notifications')">
+                <i class="fa-regular fa-bell"></i>
+                <span class="badge">3</span>
+            </div> </a>
+            <a href="landing.html" class="logout-btn" onclick="showToast('Logged out')" style="text-decoration: none; color: inherit;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- main grid: everything a student needs -->
+    <div class="dashboard-grid">
+        <!-- CURRENT GPA & PROGRESS -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-pie" style="color:#2e7ab3;"></i> Academic Progress</h3>
+                <span class="badge">CGPA 3.6</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value">3.6</div>
+                    <div class="stat-label">CGPA</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">48</div>
+                    <div class="stat-label">Credits</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">87%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+            <p style="font-size: 13px; color: #567d9f; margin-top: 10px;"><i class="fas fa-arrow-up" style="color: #1f9b4b;"></i> 3% above class average</p>
+        </div>
+
+        <!-- TODAY'S SCHEDULE (quick view) -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-clock" style="color:#cc7b2c;"></i> Today's Schedule</h3>
+                <span class="badge">3 classes</span>
+            </div>
+            <div class="timetable-row">
+                <span class="timetable-time">09:15</span>
+                <span class="timetable-subject">Data Structures</span>
+                <span class="timetable-room">Hall 204</span>
+            </div>
+            <div class="timetable-row">
+                <span class="timetable-time">11:30</span>
+                <span class="timetable-subject">Calculus II</span>
+                <span class="timetable-room">Room 315</span>
+            </div>
+            <div class="timetable-row">
+                <span class="timetable-time">14:00</span>
+                <span class="timetable-subject">Physics Lab</span>
+                <span class="timetable-room">Lab B</span>
+            </div>
+            <div style="margin-top: 18px;">
+                <a href="#" style="color: #1f6fb0; font-size: 14px;" onclick="showToast('Full schedule')"><i class="fas fa-arrow-right"></i> View full schedule</a>
+            </div>
+        </div>
+
+        <!-- CURRENT COURSES with grades -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-book" style="color:#3f8f6b;"></i> Current Courses</h3>
+                <span class="badge">6 enrolled</span>
+            </div>
+            <div class="course-item">
+                <span class="course-dot" style="background:#3b8bc0;"></span>
+                <div class="course-info">
+                    <span class="course-title">Data Structures</span>
+                    <div class="course-meta">CSCI 221 · Tue/Thu</div>
+                </div>
+                <span class="course-grade">88%</span>
+            </div>
+            <div class="course-item">
+                <span class="course-dot" style="background:#e68a3a;"></span>
+                <div class="course-info">
+                    <span class="course-title">Calculus II</span>
+                    <div class="course-meta">MATH 201 · Mon/Wed</div>
+                </div>
+                <span class="course-grade">79%</span>
+            </div>
+            <div class="course-item">
+                <span class="course-dot" style="background:#52ab7a;"></span>
+                <div class="course-info">
+                    <span class="course-title">Physics</span>
+                    <div class="course-meta">PHY 102 · Mon/Fri</div>
+                </div>
+                <span class="course-grade">84%</span>
+            </div>
+            <div class="course-item">
+                <span class="course-dot" style="background:#b55ba3;"></span>
+                <div class="course-info">
+                    <span class="course-title">Algorithms</span>
+                    <div class="course-meta">CSCI 320 · Wed/Fri</div>
+                </div>
+                <span class="course-grade">91%</span>
+            </div>
+        </div>
+
+        <!-- UPCOMING DEADLINES / ASSIGNMENTS -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-tasks" style="color:#c1593c;"></i> Upcoming Deadlines</h3>
+                <span class="badge">2 urgent</span>
+            </div>
+            <div class="upcoming-item">
+                <div class="upcoming-icon"><i class="fas fa-pen"></i></div>
+                <div class="upcoming-details">
+                    <div class="upcoming-title">Data Structures Project</div>
+                    <div class="upcoming-time">Due in 2 days</div>
+                </div>
+                <span class="upcoming-badge" style="background:#fde6e0; color:#c53b1c;">urgent</span>
+            </div>
+            <div class="upcoming-item">
+                <div class="upcoming-icon"><i class="fas fa-calculator"></i></div>
+                <div class="upcoming-details">
+                    <div class="upcoming-title">Calculus II Quiz</div>
+                    <div class="upcoming-time">Tomorrow 10am</div>
+                </div>
+                <span class="upcoming-badge" style="background:#fff0d9; color:#b86819;">soon</span>
+            </div>
+            <div class="upcoming-item">
+                <div class="upcoming-icon"><i class="fas fa-flask"></i></div>
+                <div class="upcoming-details">
+                    <div class="upcoming-title">Physics Lab Report</div>
+                    <div class="upcoming-time">Feb 20</div>
+                </div>
+                <span class="upcoming-badge" style="background:#e2f0e6; color:#1d7a54;">5 days</span>
+            </div>
+        </div>
+
+        <!-- SEMESTER PROGRESS (CHART) + QUICK ACTIONS -->
+       <a href="ai-js-chart.html" style="text-decoration: none; color: inherit;"> <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-bar" style="color:#8f5eb7;"></i> Semester Overview</h3>
+                <span class="badge">4 subjects</span>
+            </div>
+            <div class="chart-container" style="height:140px;">
+                <canvas id="semesterChart"></canvas>
+            </div>
+            <div class="actions-grid">
+                <div class="action-btn" onclick="showToast('View grades')">
+                    <i class="fas fa-star"></i>
+                    <span>Grades</span>
+                </div>
+                <div class="action-btn" onclick="showToast('Attendance report')">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                </div>
+                <div class="action-btn" onclick="showToast('Message instructor')">
+                    <i class="fas fa-comment"></i>
+                    <span>Message</span>
+                </div>
+            </div>
+        </div> </a>
+
+        <!-- RECENT NOTIFICATIONS & ANNOUNCEMENTS -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-bell" style="color:#db7f2b;"></i> Recent Alerts</h3>
+                <a href="notification-ai.html" style="text-decoration: none; color: inherit;"> <span class="badge" onclick="showToast('All notifications')">view all</span> </a>
+            </div>
+            <div class="upcoming-item" style="padding:10px 0;">
+                <div class="upcoming-icon" style="background:#fde6d6;"><i class="fas fa-graduation-cap"></i></div>
+                <div class="upcoming-details">
+                    <div class="upcoming-title">Grade posted: Algorithms</div>
+                    <div class="upcoming-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="upcoming-item" style="padding:10px 0;">
+                <div class="upcoming-icon" style="background:#ddeeff;"><i class="fas fa-calendar"></i></div>
+                <div class="upcoming-details">
+                    <div class="upcoming-title">Guest lecture at 2pm</div>
+                    <div class="upcoming-time">Today · Hall B</div>
+                </div>
+            </div>
+            <div class="upcoming-item" style="padding:10px 0;">
+                <div class="upcoming-icon" style="background:#e3f1e3;"><i class="fas fa-book"></i></div>
+                <div class="upcoming-details">
+                    <div class="upcoming-title">Library hours extended</div>
+                    <div class="upcoming-time">Finals week</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- bottom info row -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; background: white; border-radius: 26px; padding: 18px 28px; border: 1px solid #e2edf8;">
+        <div><i class="fas fa-credit-card" style="color: #2b72a5;"></i> Tuition status: <strong>Paid</strong> (next due May 15)</div>
+        <div><i class="fas fa-id-card"></i> ID: 2024CS101 · <span style="color:#2e8040;"><i class="fas fa-check-circle"></i> active</span></div>
+        <div class="btn-outline" style="padding:8px 22px; border:1px solid #b8d2ea; border-radius:40px;" onclick="showToast('Resources')"><i class="fas fa-download"></i> Resources</div>
+    </div>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast">✨</div>
+
+<script>
+    // toast function
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = '📌 ' + msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // charts
+    window.onload = function() {
+        // progress chart (GPA trend)
+        const ctx1 = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Sem1', 'Sem2', 'Sem3', 'Sem4'],
+                datasets: [{
+                    label: 'GPA',
+                    data: [3.2, 3.4, 3.5, 3.6],
+                    borderColor: '#1e7eb0',
+                    backgroundColor: 'rgba(30,126,176,0.05)',
+                    tension: 0.2,
+                    fill: true,
+                    pointBackgroundColor: '#1e7eb0'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: 2.0, max: 4.0 } }
+            }
+        });
+
+        // semester overview (subject marks)
+        const ctx2 = document.getElementById('semesterChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['DS', 'Calc', 'Physics', 'Algo'],
+                datasets: [{
+                    label: 'marks %',
+                    data: [88, 79, 84, 91],
+                    backgroundColor: ['#3b8bc0', '#e68a3a', '#52ab7a', '#b55ba3'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { max: 100, beginAtZero: true } }
+            }
+        });
+    };
+
+    window.showToast = showToast;
+</script>
+
+</body>
+</html>

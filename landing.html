@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management System · Login</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #e8f0fa 0%, #d3e4f5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* main login card container */
+        .login-container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 48px;
+            box-shadow: 0 30px 50px rgba(0, 30, 60, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        /* left side - welcome and illustration */
+        .welcome-section {
+            flex: 1.2;
+            background: #0b2e45;
+            color: white;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 300px;
+        }
+
+        .welcome-section h1 {
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .welcome-section h1 span {
+            color: #ffd966;
+            display: block;
+            font-size: 36px;
+            margin-top: 10px;
+        }
+
+        .welcome-section p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .feature-list li i {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd966;
+        }
+
+        /* right side - login form area */
+        .login-section {
+            flex: 1;
+            background: white;
+            padding: 50px 45px;
+            min-width: 350px;
+        }
+
+        .login-section h2 {
+            font-size: 32px;
+            color: #174267;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .login-section .subtitle {
+            color: #597b9c;
+            margin-bottom: 35px;
+            font-size: 16px;
+        }
+
+        /* role dropdown selector */
+        .role-selector {
+            margin-bottom: 30px;
+        }
+
+        .role-selector label {
+            display: block;
+            font-weight: 600;
+            color: #1a4f79;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .dropdown-container {
+            position: relative;
+        }
+
+        .selected-role {
+            width: 100%;
+            padding: 18px 22px;
+            background: #f5faff;
+            border: 2px solid #d9e8f5;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 17px;
+            color: #1e4d73;
+            font-weight: 500;
+        }
+
+        .selected-role i {
+            color: #2f6ea2;
+            transition: transform 0.2s;
+        }
+
+        .selected-role:hover {
+            border-color: #9fc1e0;
+            background: #edf5ff;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 30, 60, 0.15);
+            border: 1px solid #dbe9f5;
+            overflow: hidden;
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .role-option {
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #ecf3fc;
+        }
+
+        .role-option:last-child {
+            border-bottom: none;
+        }
+
+        .role-option:hover {
+            background: #eaf3fe;
+        }
+
+        .role-option i {
+            width: 32px;
+            height: 32px;
+            background: #e1edfc;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f6cae;
+            font-size: 18px;
+        }
+
+        .role-option .role-text {
+            font-weight: 600;
+            color: #1c4970;
+        }
+
+        .role-option .role-desc {
+            font-size: 13px;
+            color: #6d8fae;
+            margin-left: auto;
+        }
+
+        /* login forms (dynamic) */
+        .login-form {
+            margin-top: 20px;
+            transition: opacity 0.2s;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #20507a;
+            font-size: 15px;
+        }
+
+        .input-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 20px;
+            color: #6f95bb;
+            font-size: 18px;
+        }
+
+        .input-icon input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            border: 2px solid #e2effa;
+            border-radius: 28px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+            background: #fbfeff;
+        }
+
+        .input-icon input:focus {
+            border-color: #3080c0;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(48, 128, 192, 0.1);
+        }
+
+        .forgot-link {
+            text-align: right;
+            margin: 12px 0 25px;
+        }
+
+        .forgot-link a {
+            color: #2d6ca3;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: #1b6bb0;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            background: #145a96;
+        }
+
+        .signup-text {
+            text-align: center;
+            color: #6484a5;
+            font-size: 15px;
+        }
+
+        .signup-text a {
+            color: #1b6bb0;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .role-specific-note {
+            background: #f2f9ff;
+            border-radius: 18px;
+            padding: 14px 18px;
+            margin: 20px 0 10px;
+            font-size: 14px;
+            color: #2d618a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px dashed #b9d6f0;
+        }
+
+        /* toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e4e6f;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 2000;
+        }
+        .toast.show { opacity: 1; }
+
+        @media (max-width: 750px) {
+            .login-container { flex-direction: column; border-radius: 32px; }
+            .welcome-section { padding: 40px 30px; }
+            .welcome-section h1 { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <!-- LEFT SIDE: WELCOME MESSAGE (exactly as requested) -->
+    <div class="welcome-section">
+        <h1>
+            Hello, welcome to
+            <span>School Management System</span>
+        </h1>
+        <p>Access your personalized dashboard and stay connected with your academic journey.</p>
+        <ul class="feature-list">
+            <li><i class="fas fa-check"></i> Real-time grades & attendance</li>
+            <li><i class="fas fa-check"></i> Assignment notifications</li>
+            <li><i class="fas fa-check"></i> Parent-teacher communication</li>
+            <li><i class="fas fa-check"></i> Secure role-based access</li>
+        </ul>
+    </div>
+
+    <!-- RIGHT SIDE: DYNAMIC LOGIN FORM WITH ROLE DROPDOWN -->
+    <div class="login-section">
+        <h2>Sign in</h2>
+        <div class="subtitle">Choose your role and login</div>
+
+        <!-- ROLE DROPDOWN - select your role (4 roles) -->
+        <div class="role-selector">
+            <label><i class="fas fa-user-tag"></i> Select your role</label>
+            <div class="dropdown-container">
+                <!-- Selected role display (click to toggle dropdown) -->
+                <div class="selected-role" id="selectedRoleDisplay" onclick="toggleDropdown()">
+                    <span><i class="fas fa-graduation-cap" style="margin-right: 12px;"></i> Choose role...</span>
+                    <i class="fas fa-chevron-down" id="dropdownArrow"></i>
+                </div>
+                <!-- Dropdown menu with 4 roles: Student, Admin, Teacher, Parent -->
+                <div class="dropdown-menu" id="roleDropdown">
+                    <!-- Student option -->
+                    <div class="role-option" onclick="selectRole('student')">
+                        <i class="fas fa-user-graduate"></i>
+                        <span class="role-text">Student</span>
+                        <span class="role-desc">access courses & grades</span>
+                    </div>
+                    <!-- Admin option -->
+                    <div class="role-option" onclick="selectRole('admin')">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="role-text">Admin</span>
+                        <span class="role-desc">manage system</span>
+                    </div>
+                    <!-- Teacher option -->
+                    <div class="role-option" onclick="selectRole('teacher')">
+                        <i class="fas fa-chalkboard-user"></i>
+                        <span class="role-text">Teacher</span>
+                        <span class="role-desc">classes & assignments</span>
+                    </div>
+                    <!-- Parent option -->
+                    <div class="role-option" onclick="selectRole('parent')">
+                        <i class="fas fa-family"></i>
+                        <span class="role-text">Parent</span>
+                        <span class="role-desc">track your child</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DYNAMIC LOGIN FORM AREA - changes based on selected role -->
+        <div class="login-form" id="loginForm">
+            <!-- default message (no role selected) -->
+            <div style="text-align: center; padding: 30px 0; color: #8aa9c4;">
+                <i class="fas fa-arrow-up" style="font-size: 28px; margin-bottom: 12px; display: block;"></i>
+                <p>Please select a role to continue</p>
+            </div>
+        </div>
+
+        <!-- extra info (optional) -->
+        <div style="margin-top: 25px; text-align: center; font-size: 14px; color: #8ba5c0;">
+            <i class="fas fa-shield-alt"></i> Role-based access · secure login
+        </div>
+    </div>
+</div>
+
+<!-- toast for demo interactions -->
+<div class="toast" id="toast"></div>
+
+<script>
+    // ==================== TOAST FUNCTION (for feedback) ====================
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ==================== DROPDOWN TOGGLE ====================
+    function toggleDropdown() {
+        const dropdown = document.getElementById('roleDropdown');
+        const arrow = document.getElementById('dropdownArrow');
+        dropdown.classList.toggle('show');
+        // rotate arrow when open
+        if (dropdown.classList.contains('show')) {
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // close dropdown if clicked outside (optional)
+    window.onclick = function(event) {
+        if (!event.target.closest('.dropdown-container')) {
+            const dropdown = document.getElementById('roleDropdown');
+            const arrow = document.getElementById('dropdownArrow');
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+
+    // ==================== ROLE SELECTION ====================
+    function selectRole(role) {
+        // update selected role display text
+        const display = document.getElementById('selectedRoleDisplay').querySelector('span');
+        const dropdown = document.getElementById('roleDropdown');
+        const arrow = document.getElementById('dropdownArrow');
+        
+        // set icon and text based on role
+        let roleText = '';
+        let iconHtml = '';
+        if (role === 'student') {
+            roleText = 'Student';
+            iconHtml = '<i class="fas fa-user-graduate" style="margin-right: 12px;"></i>';
+        } else if (role === 'admin') {
+            roleText = 'Admin';
+            iconHtml = '<i class="fas fa-user-tie" style="margin-right: 12px;"></i>';
+        } else if (role === 'teacher') {
+            roleText = 'Teacher';
+            iconHtml = '<i class="fas fa-chalkboard-user" style="margin-right: 12px;"></i>';
+        } else if (role === 'parent') {
+            roleText = 'Parent';
+            iconHtml = '<i class="fas fa-family" style="margin-right: 12px;"></i>';
+        }
+        display.innerHTML = iconHtml + roleText;
+
+        // close dropdown
+        dropdown.classList.remove('show');
+        arrow.style.transform = 'rotate(0deg)';
+
+        // now update the login form based on selected role
+        updateLoginForm(role);
+    }
+
+    // ==================== DYNAMIC FORM GENERATOR ====================
+    function updateLoginForm(role) {
+        const formContainer = document.getElementById('loginForm');
+        let formHtml = '';
+
+        if (role === 'student') {
+            formHtml = `
+                <div class="role-specific-note">
+                    <i class="fas fa-graduation-cap"></i> Student portal · access your courses
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Student ID / Email</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="text" placeholder="e.g., alex.j@student.edu" id="studentUser">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="••••••••" id="studentPass">
+                    </div>
+                </div>
+                <div class="forgot-link"><a href="#" onclick="showToast('Reset link sent to email')">Forgot password?</a></div>
+                <button class="login-btn" onclick="showToast('Logging in as Student')"><i class="fas fa-arrow-right-to-bracket"></i><a href="index.html" style="text-decoration: none; color: inherit;">  Login as Student  </a></button>
+            `;
+        } else if (role === 'admin') {
+            formHtml = `
+                <div class="role-specific-note">
+                    <i class="fas fa-user-tie"></i> Admin access · full system control
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Admin username</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="admin" id="adminUser">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="••••••••" id="adminPass">
+                    </div>
+                </div>
+                <div class="forgot-link"><a href="#" onclick="showToast('Contact IT support')">Reset admin password</a></div>
+                <button class="login-btn" onclick="showToast('Admin dashboard loading')"><i class="fas fa-shield"></i> Login as Admin</button>
+            `;
+        } else if (role === 'teacher') {
+            formHtml = `
+                <div class="role-specific-note">
+                    <i class="fas fa-chalkboard"></i> Teacher · manage classes & grades
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Staff email</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="text" placeholder="teacher@school.edu" id="teacherUser">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="••••••••" id="teacherPass">
+                    </div>
+                </div>
+                <div class="forgot-link"><a href="#" onclick="showToast('Check your email')">Reset password</a></div>
+                <button class="login-btn" onclick="showToast('Welcome, Teacher')"><i class="fas fa-chalkboard-user"></i> Login as Teacher</button>
+            `;
+        } else if (role === 'parent') {
+            formHtml = `
+                <div class="role-specific-note">
+                    <i class="fas fa-family"></i> Parent portal · follow your child's progress
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Parent email</label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="text" placeholder="parent@example.com" id="parentUser">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-child"></i> Student ID (optional)</label>
+                    <div class="input-icon">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" placeholder="2024CS101" id="studentId">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-icon">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="••••••••" id="parentPass">
+                    </div>
+                </div>
+                <div class="forgot-link"><a href="#" onclick="showToast('Recovery email sent')">Forgot password?</a></div>
+                <button class="login-btn" onclick="showToast('Parent dashboard loading')"><i class="fas fa-users"></i> Login as Parent</button>
+            `;
+        }
+
+        // add signup suggestion (same for all)
+        formHtml += `<div class="signup-text">Don't have an account? <a href="#" onclick="showToast('Contact administration')">Contact admin</a></div>`;
+
+        // update container
+        formContainer.innerHTML = formHtml;
+    }
+
+    // initial: no role selected, but we keep the default message.
+    // The default message is already in HTML, but we can also set it empty.
+    // To avoid confusion, we keep default and override when role selected.
+
+    // close dropdown if open when scrolling (just a nicety)
+</script>
+
+<!-- comments:
+    - The page starts with a welcoming left panel.
+    - The dropdown contains 4 roles: Student, Admin, Teacher, Parent.
+    - When a role is selected, the login form changes dynamically.
+    - Each role has slightly different fields (Student: ID/pass, Admin: username/pass, Teacher: email/pass, Parent: email + optional student ID)
+    - Clicking login triggers a toast notification (demo).
+    - Comments are added throughout to explain functionality.
+-->
+
+<!-- additional note: all interactive elements are for demonstration -->
+</body>
+</html>

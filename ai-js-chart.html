@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard · 4 semesters results</title>
+    <!-- Chart.js (lightweight & simple) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f2f8ff;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* simple sidebar – just for context */
+        .sidebar {
+            width: 240px;
+            background: #102c43;
+            color: white;
+            padding: 28px 16px;
+        }
+
+        .sidebar h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #2f4b64;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 14px 18px;
+            margin: 6px 0;
+            border-radius: 14px;
+            color: #cddcec;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar li.active {
+            background: #1d4a6b;
+            color: white;
+        }
+
+        /* main content */
+        .main-content {
+            flex: 1;
+            padding: 30px 35px;
+            background: #f5faff;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 18px 28px;
+            border-radius: 28px;
+            margin-bottom: 35px;
+            border: 1px solid #deecf5;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 650;
+            color: #143e5c;
+        }
+
+        .logout {
+            background: #fef0ec;
+            color: #b34545;
+            padding: 10px 28px;
+            border-radius: 40px;
+            text-decoration: none;
+        }
+
+        /* chart grid – two charts per row on desktop */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+            margin: 30px 0 40px 0;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 26px;
+            padding: 22px 22px 18px 22px;
+            border: 1px solid #e2eefa;
+            box-shadow: 0 6px 16px rgba(0, 20, 40, 0.04);
+        }
+
+        .chart-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1c5275;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+            padding-left: 8px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        /* semester summary cards (small stats) */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .sem-summary {
+            background: white;
+            border-radius: 22px;
+            padding: 18px;
+            border: 1px solid #d8e8f5;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sem-title {
+            font-weight: 700;
+            color: #1a4c70;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sem-percent {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f6e9c;
+        }
+
+        .sem-detail {
+            color: #527a9c;
+            font-size: 14px;
+            border-top: 1px dashed #bdd3e8;
+            padding-top: 10px;
+            margin-top: 6px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #1e4e6f;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        a{
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+            .chart-grid { grid-template-columns: 1fr; }
+            .summary-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 550px) {
+            .main-content { padding: 20px; }
+            .summary-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- minimal sidebar (just to match student dashboard style) -->
+<div class="sidebar">
+    <h3><i class="fas fa-graduation-cap"></i> Student</h3>
+    <ul class="sidebar-menu">
+        <li class="active"><i class="fas fa-home"></i> Dashboard</li>
+        <a href="result.html"><li><i class="fas fa-chart-bar" style="text-decoration: none; color: inherit;"></i> Result</li> </a>
+        <li><i class="fas fa-school"></i> <a href="ai-js-chart.html" style="text-decoration: none; color: inherit;">View Semester</a></li>
+         <a href="course.html" style="text-decoration: none; color: inherit;"><li><i class="fas fa-book-open"></i> Courses</li> </a>
+       <a href="notification-ai.html" style="text-decoration: none; color: inherit;"> <li><i class="fas fa-bell"></i> Notifications</li> </a>
+        <a href="profile.html" style="text-decoration: none; color: inherit;"><li><i class="fas fa-user"></i> Profile</li> </a>
+    </ul>
+</div>
+
+<!-- main area -->
+<div class="main-content">
+    <div class="top-bar">
+        <div class="page-title">
+            <i class="fas fa-chart-line" style="color: #2b7bb0;"></i> My academic progress
+        </div>
+        <a href="landing.html" class="logout" onclick="showToast('Logged out')" style="text-decoration: none; color: inherit;"><i class="fas fa-sign-out-alt"></i> logout</a>
+    </div>
+
+    <!-- chart grid: 4 semesters in 2x2 layout -->
+    <div class="chart-grid" id="chartGrid">
+        <!-- semester 1 chart card -->
+        <div class="chart-card">
+            <h3><i class="fas fa-leaf" style="color:#2f8b5e;"></i> Semester 1 · 2024</h3>
+            <div class="chart-container">
+                <canvas id="semester1Chart"></canvas>
+            </div>
+        </div>
+        <!-- semester 2 chart card -->
+        <div class="chart-card">
+            <h3><i class="fas fa-cloud-sun" style="color:#c97f3a;"></i> Semester 2 · 2024</h3>
+            <div class="chart-container">
+                <canvas id="semester2Chart"></canvas>
+            </div>
+        </div>
+        <!-- semester 3 chart card -->
+        <div class="chart-card">
+            <h3><i class="fas fa-snowflake" style="color:#3f84ab;"></i> Semester 3 · 2025</h3>
+            <div class="chart-container">
+                <canvas id="semester3Chart"></canvas>
+            </div>
+        </div>
+        <!-- semester 4 chart card -->
+        <div class="chart-card">
+            <h3><i class="fas fa-sun" style="color:#d18f2c;"></i> Semester 4 · 2025</h3>
+            <div class="chart-container">
+                <canvas id="semester4Chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- quick summary cards for each semester (average %) -->
+    <div class="summary-cards" id="summaryCards"></div>
+
+    <!-- extra note: click on any chart to see details -->
+    <div style="margin-top: 35px; background: #e6f0fe; border-radius: 28px; padding: 18px 26px; color: #2b5980; display: flex; gap: 16px; align-items: center;">
+        <i class="fas fa-info-circle fa-lg"></i>
+        <span>Click on any chart bar to see subject details · 4 semesters shown as percentage marks</span>
+    </div>
+</div>
+
+<!-- toast notification -->
+<div class="toast" id="toast">✨</div>
+
+<script>
+    // ==================== DATA: 4 semesters with marks (percentages) ====================
+    const semesterData = [
+        {
+            name: 'Semester 1',
+            subjects: ['Mathematics', 'Physics', 'Programming', 'English'],
+            marks: [82, 75, 91, 68],    // percentages
+            colors: ['#3b8bc0', '#3b8bc0', '#3b8bc0', '#3b8bc0']
+        },
+        {
+            name: 'Semester 2',
+            subjects: ['Calculus II', 'Data Structures', 'Digital Logic', 'Technical Writing'],
+            marks: [79, 88, 72, 85],
+            colors: ['#e68a3a', '#e68a3a', '#e68a3a', '#e68a3a']
+        },
+        {
+            name: 'Semester 3',
+            subjects: ['Algorithms', 'Computer Arch', 'Discrete Math', 'Economics'],
+            marks: [91, 76, 84, 70],
+            colors: ['#52ab7a', '#52ab7a', '#52ab7a', '#52ab7a']
+        },
+        {
+            name: 'Semester 4',
+            subjects: ['Database', 'Operating Systems', 'Software Eng', 'AI Fundamentals'],
+            marks: [87, 82, 78, 93],
+            colors: ['#b55ba3', '#b55ba3', '#b55ba3', '#b55ba3']
+        }
+    ];
+
+    // ==================== FUNCTION TO CREATE A CHART ====================
+    function createChart(canvasId, subjectLabels, marksData, barColor) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: subjectLabels,
+                datasets: [{
+                    label: 'Marks (%)',
+                    data: marksData,
+                    backgroundColor: barColor || 'rgba(54, 162, 235, 0.7)',
+                    borderColor: barColor ? barColor.replace('0.7', '1') : 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    barPercentage: 0.65
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => ` ${context.raw}%`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: '#e2ecf5' },
+                        title: { display: true, text: 'percentage' }
+                    }
+                },
+                onClick: (event, item) => {
+                    if (item.length > 0) {
+                        const index = item[0].dataIndex;
+                        const dataset = event.chart.data.datasets[0];
+                        const subject = event.chart.data.labels[index];
+                        const mark = dataset.data[index];
+                        showToast(`${subject}: ${mark}%`);
+                    }
+                }
+            }
+        });
+    }
+
+    // ==================== RENDER SUMMARY CARDS (average per semester) ====================
+    function renderSummaryCards() {
+        const container = document.getElementById('summaryCards');
+        if (!container) return;
+
+        let html = '';
+        semesterData.forEach((sem, idx) => {
+            const avg = (sem.marks.reduce((a, b) => a + b, 0) / sem.marks.length).toFixed(1);
+            const icon = ['fa-leaf', 'fa-cloud-sun', 'fa-snowflake', 'fa-sun'][idx];
+            const colors = ['#1e7e54', '#b5651e', '#2879b7', '#aa4d8f'];
+            
+            html += `<div class="sem-summary" onclick="showToast('${sem.name} average: ${avg}%')">`;
+            html += `<div class="sem-title"><span><i class="fas ${icon}" style="color:${colors[idx]};"></i> ${sem.name}</span> <span>${avg}%</span></div>`;
+            html += `<div class="sem-percent">${avg}%</div>`;
+            html += `<div class="sem-detail"><i class="fas fa-arrow-up"></i> ${sem.marks.filter(m => m >= 75).length} subjects ≥75%</div>`;
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // ==================== TOAST FUNCTION ====================
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = '📊 ' + message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ==================== INITIALIZE ALL CHARTS ====================
+    window.onload = function() {
+        // semester 1 chart (canvas id: semester1Chart)
+        createChart('semester1Chart', semesterData[0].subjects, semesterData[0].marks, '#3b8bc0');
+        // semester 2
+        createChart('semester2Chart', semesterData[1].subjects, semesterData[1].marks, '#e68a3a');
+        // semester 3
+        createChart('semester3Chart', semesterData[2].subjects, semesterData[2].marks, '#52ab7a');
+        // semester 4
+        createChart('semester4Chart', semesterData[3].subjects, semesterData[3].marks, '#b55ba3');
+
+        // render summary cards
+        renderSummaryCards();
+
+        // add click to summary cards already handled by onclick in html
+    };
+
+    // expose for logout
+    window.showToast = showToast;
+</script>
+
+</body>
+</html>

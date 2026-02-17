@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentHub · Results (sidebar, result active)</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #eef3f8;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========= SIDEBAR ========= */
+        .sidebar {
+            width: 260px;
+            background: #0f2a40;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            color: #d2e0f0;
+            box-shadow: 6px 0 20px rgba(0, 20, 30, 0.1);
+        }
+
+        .sidebar .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 3rem;
+            padding-left: 8px;
+        }
+
+        .sidebar .logo-icon {
+            background: #2d4b6e;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.8rem 1rem;
+            margin: 6px 0;
+            border-radius: 16px;
+            color: #b0c9e5;
+            font-weight: 500;
+            transition: 0.2s;
+            cursor: default;
+        }
+
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+        }
+
+        /* ACTIVE STATE NOW ON RESULT (not dashboard) */
+        .nav-item.active {
+            background: #1e405e;
+            color: white;
+            box-shadow: 0 6px 12px rgba(0,10,20,0.4);
+        }
+
+        .nav-item:not(.active):hover {
+            background: #1a354b;
+            color: #ecf3fc;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            font-size: 0.8rem;
+            color: #6f93b5;
+            text-align: center;
+        }
+
+        /* ========= MAIN CONTENT ========= */
+        .main-content {
+            flex: 1;
+            padding: 2rem 2.2rem;
+            overflow-y: auto;
+            max-width: calc(100% - 260px);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .welcome h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #122b40;
+        }
+
+        .date-badge {
+            background: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #1f3c58;
+            box-shadow: 0 6px 14px rgba(0,20,40,0.04);
+            border: 1px solid #dce6f0;
+        }
+
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1rem 2rem 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid #e0eaf3;
+            box-shadow: 0 10px 18px -10px rgba(7, 48, 73, 0.1);
+        }
+
+        .stat-icon {
+            background: #edf4fc;
+            width: 52px;
+            height: 52px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #1e3c5c;
+        }
+
+        .stat-details h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #142e46;
+        }
+
+        .stat-details p {
+            color: #59748f;
+            font-weight: 500;
+        }
+
+        .columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .left-col {
+            flex: 2;
+            min-width: 340px;
+        }
+
+        .right-col {
+            flex: 1.1;
+            min-width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* result card */
+        .result-card {
+            background: white;
+            border-radius: 32px;
+            padding: 1.8rem 1.6rem;
+            border: 1px solid #e2eaf3;
+            box-shadow: 0 18px 30px -12px rgba(20, 40, 65, 0.12);
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #153049;
+        }
+
+        .sem-badge {
+            background: #e4ecf7;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #1e4a72;
+        }
+
+        /* search bar - instant filter */
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f2f7fd;
+            border-radius: 60px;
+            padding: 0.15rem 0.15rem 0.15rem 1.2rem;
+            border: 1px solid #ccddec;
+            margin-bottom: 1rem;
+        }
+
+        .search-wrapper i {
+            color: #6986a6;
+        }
+
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 0.8rem 0.7rem;
+            width: 100%;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #8da3c0;
+            font-weight: 400;
+        }
+
+        .filter-hint {
+            font-size: 0.75rem;
+            color: #4e6f8c;
+            margin-bottom: 1.2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.7rem 0.3rem 0.7rem 0;
+            color: #47647c;
+            font-weight: 500;
+            border-bottom: 1px solid #dbe5f0;
+        }
+
+        td {
+            padding: 0.9rem 0.3rem 0.9rem 0;
+            border-bottom: 1px solid #eef3fa;
+            color: #1a3148;
+            font-weight: 500;
+        }
+
+        .course-code {
+            color: #3c5b7c;
+            font-size: 0.8rem;
+        }
+
+        .grade-A, .grade-Aplus, .grade-B, .grade-C {
+            font-weight: 700;
+        }
+        .grade-A, .grade-Aplus { color: #1e7842; }
+        .grade-B { color: #b16f27; }
+        .grade-C { color: #b13e3e; }
+
+        .total-badge-sm {
+            background: #e4edf8;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #173e60;
+        }
+
+        /* right panel widgets (unchanged, reference style) */
+        .widget {
+            background: white;
+            border-radius: 26px;
+            padding: 1.4rem 1.3rem;
+            border: 1px solid #e2eaf3;
+            box-shadow: 0 10px 20px -10px rgba(0, 30, 50, 0.06);
+        }
+
+        .widget-title {
+            font-weight: 600;
+            color: #153a57;
+            margin-bottom: 1.1rem;
+            font-size: 1.1rem;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .deadline-item, .alert-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.9rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #dde6f1;
+        }
+        .deadline-item:last-child, .alert-item:last-child { border: none; margin-bottom: 0; }
+
+        .deadline-title { font-weight: 600; color: #142f47; font-size: 0.9rem; }
+        .deadline-meta { font-size: 0.7rem; color: #6f8aa8; }
+
+        .urgent-tag { background: #fde6e8; color: #b13e4b; border-radius: 20px; padding: 0.2rem 0.9rem; font-size: 0.7rem; font-weight: 600; }
+        .soon-tag { background: #ffeed9; color: #aa6018; border-radius: 20px; padding: 0.2rem 0.9rem; }
+        .days-tag { background: #e2edfd; color: #164c84; border-radius: 20px; padding: 0.2rem 0.9rem; }
+
+        .current-course-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        .course-dot { width: 10px; height: 10px; border-radius: 4px; background: #1e3c5c; }
+        .course-dot.orange { background: #c96422; }
+        .course-dot.green { background: #2a7a48; }
+        .course-info p { font-weight: 600; color: #1a334d; }
+        .course-info small { color: #5d7b9c; }
+
+        .semester-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .tag { background: #eaf1fa; padding: 0.3rem 1.2rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500; color: #1c4a73; }
+        .tag.urgent { background: #fce4e6; color: #b13e3e; }
+        .tag.soon { background: #feeedb; color: #aa5f17; }
+
+        hr { border: 1px solid #e4ecf5; margin: 1rem 0; }
+
+        a{
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR with RESULT active (highlighted) -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon">SH</div>
+            <span class="logo-text">StudentHub</span>
+        </div>
+
+        <!-- Dashboard is now regular, RESULT is active -->
+        <div class="nav-item">
+            <i class="fas fa-home"></i> <span><a href="index.html">Dashboard</a></span>
+        </div>
+        <div class="nav-item active">
+            <i class="fas "></i> <span> <a href="result.html"> View Result</a> </span> 
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-school"></i> <span><a href="ai-js-chart.html"> Semester</span> </a> 
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-book"></i> <span><a href="course.html"> Courses </a> </span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-bell"></i> <span><a href="notification-ai.html">Notifications</a></span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i> <span> <a href="profile.html">Profile</a> </span>
+        </div>
+
+        <div class="sidebar-footer">
+            <i class="far fa-moon"></i>  ·  v2.026
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT (result page) -->
+    <div class="main-content">
+        <!-- Welcome row -->
+        <div class="top-bar">
+            <div class="welcome">
+                <h1>Welcome back, Adamu <span>🎉</span></h1>
+            </div>
+            <div class="date-badge"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i> Feb 14, 2026</div>
+        </div>
+
+        <!-- Academic progress cards -->
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-details"><h2>3.6</h2><p>CGPA</p></div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-book-open"></i></div><div class="stat-details"><h2>48</h2><p>Credits</p></div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-details"><h2>87%</h2><p>Attendance</p></div></div>
+        </div>
+
+        <!-- columns: RESULT TABLE + WIDGETS -->
+        <div class="columns">
+            <!-- LEFT: result table with instant filter -->
+            <div class="left-col">
+                <div class="result-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-chart-simple" style="margin-right: 8px; color:#1e3c5c;"></i> CA & Exam results</h3>
+                        <span class="sem-badge">Sem II · 2025/26</span>
+                    </div>
+
+                    <!-- search bar - instant filter (no button) -->
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="instantFilterInput" placeholder="Filter by course, code, grade (A, B, data...)">
+                    </div>
+                    <div class="filter-hint"><i class="fas fa-lightbulb"></i> <!--Instant filtering — start typing to see results --></div>
+
+                    <table id="resultsTable">
+                        <thead>
+                            <tr><th>Course</th><th>Code</th><th>CA (40)</th><th>Exam (60)</th><th>Total</th><th>Grade</th></tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td>Data Structures</td><td class="course-code">CSCI 221</td><td>34</td><td>51</td><td>85</td><td class="grade-A">A</td></tr>
+                            <tr><td>Calculus II</td><td class="course-code">MATH 201</td><td>28</td><td>42</td><td>70</td><td class="grade-B">B+</td></tr>
+                            <tr><td>Physics Lab</td><td class="course-code">PHY 102</td><td>36</td><td>53</td><td>89</td><td class="grade-A">A</td></tr>
+                            <tr><td>Algorithms</td><td class="course-code">CSCI 320</td><td>31</td><td>47</td><td>78</td><td class="grade-B">B</td></tr>
+                            <tr><td>Linear Algebra</td><td class="course-code">MATH 210</td><td>22</td><td>38</td><td>60</td><td class="grade-C">C</td></tr>
+                            <tr><td>Database Systems</td><td class="course-code">CSCI 250</td><td>37</td><td>58</td><td>95</td><td class="grade-Aplus">A+</td></tr>
+                            <tr><td>Discrete Math</td><td class="course-code">MATH 110</td><td>29</td><td>41</td><td>70</td><td class="grade-B">B</td></tr>
+                        </tbody>
+                    </table>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                        <span class="total-badge-sm"><i class="far fa-list-alt"></i> <span id="courseCount">7</span> courses</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: reference widgets (exactly as before) -->
+            <div class="right-col">
+                <div class="widget">
+                    <div class="widget-title"><i class="far fa-clock"></i> Today's Schedule</div>
+                    <div class="deadline-item"><span>09:15</span> <span class="deadline-title">Data Structures</span></div>
+                    <div class="deadline-item"><span>11:30</span> <span class="deadline-title">Calculus II</span></div>
+                    <div class="deadline-item"><span>14:00</span> <span class="deadline-title">Physics Lab</span></div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-title"><i class="fas fa-chalkboard"></i> Current Courses</div>
+                    <div class="current-course-item"><div class="course-dot"></div><div class="course-info"><p>Data Structures <small>· Hall 204, CSCI 221 Tue/Thu</small></p></div></div>
+                    <div class="current-course-item"><div class="course-dot orange"></div><div class="course-info"><p>Calculus II <small>· Room 315, MATH 201 Mon/Wed</small></p></div></div>
+                    <div class="current-course-item"><div class="course-dot green"></div><div class="course-info"><p>Physics Lab <small>· Lab B, PHY 102 Mon/Fri</small></p></div></div>
+                    <div class="current-course-item"><div class="course-dot" style="background:#8f6bb3;"></div><div class="course-info"><p>Algorithms <small>· CSCI 320 Wed/Fri 91%</small></p></div></div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-title"><i class="fas fa-exclamation-triangle"></i> Upcoming Deadlines</div>
+                    <div class="deadline-item"><div><div class="deadline-title">Data Structures Project</div><div class="deadline-meta"><i class="far fa-hourglass"></i> Due in 2 days</div></div> <span class="urgent-tag">urgent</span></div>
+                    <div class="deadline-item"><div><div class="deadline-title">Calculus II Quiz</div><div class="deadline-meta"><i class="far fa-clock"></i> Tomorrow 10am</div></div> <span class="soon-tag">soon</span></div>
+                    <div class="deadline-item"><div><div class="deadline-title">Physics Lab Report</div><div class="deadline-meta"><i class="far fa-calendar"></i> 5 days</div></div> <span class="days-tag">5 days</span></div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-title"><i class="fas fa-bell"></i> Recent Alerts</div>
+                    <div class="alert-item"><span class="deadline-title">Grade posted: Algorithms</span> <span class="deadline-meta">2h ago</span></div>
+                    <div class="alert-item"><span class="deadline-title">Guest lecture at 2pm</span> <span class="deadline-meta">Today · Hall B</span></div>
+                    <div class="alert-item"><span class="deadline-title">Library hours extended</span> <span class="deadline-meta">Finals week</span></div>
+                </div>
+
+                <div class="semester-tags">
+                    <span class="tag urgent">urgent</span>
+                    <span class="tag soon">soon</span>
+                    <span class="tag">5 days</span>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        <div style="display: flex; gap: 18px; align-items: center; color: #496782; padding: 0.4rem 0 0.8rem;">
+            <i class="fas fa-flag-checkered"></i> <span>Semester overview:</span>
+            <span class="tag urgent" style="background:#fce4e6;">urgent</span>
+            <span class="tag soon">soon</span>
+            <span class="tag">5 days</span>
+            <span style="margin-left: auto;">© StudentHub · result management</span>
+        </div>
+    </div>
+
+    <!-- AUTO FILTER SCRIPT (instant on input) -->
+    <script>
+        (function() {
+            const input = document.getElementById('instantFilterInput');
+            const tbody = document.getElementById('tableBody');
+            const courseCountSpan = document.getElementById('courseCount');
+            // store original rows
+            const originalRows = Array.from(tbody.querySelectorAll('tr'));
+
+            function filterTableInstant() {
+                const query = input.value.trim().toLowerCase();
+                let filteredRows;
+
+                if (query === '') {
+                    filteredRows = originalRows;
+                } else {
+                    filteredRows = originalRows.filter(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length < 6) return false;
+                        const courseName = cells[0].innerText.toLowerCase();
+                        const courseCode = cells[1].innerText.toLowerCase();
+                        const grade = cells[5].innerText.toLowerCase();
+                        return courseName.includes(query) || courseCode.includes(query) || grade.includes(query);
+                    });
+                }
+
+                tbody.innerHTML = '';
+
+                if (filteredRows.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `<td colspan="6" style="text-align:center; padding:2rem; color:#708aa8;">📭 No matching results</td>`;
+                    tbody.appendChild(emptyRow);
+                    courseCountSpan.innerText = '0';
+                } else {
+                    filteredRows.forEach(row => tbody.appendChild(row));
+                    courseCountSpan.innerText = filteredRows.length;
+                }
+            }
+
+            input.addEventListener('input', filterTableInstant);
+            courseCountSpan.innerText = originalRows.length;
+        })();
+    </script>
+</body>
+</html>

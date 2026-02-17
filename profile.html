@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+    <title>Profile · Student dashboard</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f0f5fc;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR (minimal, dark) ===== */
+        .sidebar {
+            width: 250px;
+            background: #0b253a;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            padding: 28px 18px;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #2f4a63;
+            margin-bottom: 25px;
+        }
+
+        .sidebar h2 i {
+            color: #b0d2f0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            margin: 6px 0;
+            border-radius: 12px;
+            color: #c9daec;
+            font-weight: 500;
+        }
+
+        .sidebar li i {
+            width: 24px;
+            color: #9db7d6;
+        }
+
+        .sidebar li.active {
+            background: #1a4465;
+            color: white;
+            border-left: 4px solid #6bb0f0;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px 35px;
+            background: #f8fcff;
+        }
+
+        /* top bar with logout */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 28px;
+            border-radius: 24px;
+            margin-bottom: 30px;
+            border: 1px solid #e2eef8;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title h1 {
+            font-size: 26px;
+            font-weight: 650;
+            color: #164368;
+        }
+
+        .page-title i {
+            color: #2f74ad;
+            font-size: 28px;
+        }
+
+        .logout-link {
+            background: #feece9;
+            color: #b34545;
+            text-decoration: none;
+            padding: 10px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #fad7d0;
+        }
+
+        /* profile card (two-column) */
+        .profile-card {
+            background: white;
+            border-radius: 30px;
+            border: 1px solid #e5eefa;
+            padding: 30px 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 6px 14px rgba(0,20,40,0.02);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .profile-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            min-width: 160px;
+        }
+
+        .avatar-image {
+            width: 130px;
+            height: 130px;
+            background: #d9eaf8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: #2c638b;
+            border: 4px solid white;
+            box-shadow: 0 8px 16px rgba(0,30,60,0.1);
+        }
+
+        .avatar-edit {
+            background: #f0f7ff;
+            padding: 8px 28px;
+            border-radius: 40px;
+            color: #1f6290;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid #c6ddf2;
+            cursor: pointer;
+        }
+
+        .profile-info {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px 35px;
+        }
+
+        .info-field {
+            border-bottom: 1px dashed #d2e2f2;
+            padding-bottom: 12px;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #6283a0;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d486b;
+        }
+
+        /* stat cards (exactly like image: 3 cards) */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 26px 20px;
+            border: 1px solid #e5eefa;
+            box-shadow: 0 6px 14px rgba(0,20,40,0.02);
+            text-align: center;
+            transition: 0.15s;
+        }
+
+        .stat-card:hover {
+            border-color: #c4d9f0;
+            box-shadow: 0 10px 22px rgba(30,70,120,0.06);
+        }
+
+        .stat-number {
+            font-size: 44px;
+            font-weight: 700;
+            color: #1b5480;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            font-weight: 500;
+            color: #3a6588;
+            margin-bottom: 8px;
+        }
+
+        .stat-sub {
+            font-size: 14px;
+            color: #7797b5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* quick navigation / sidebar inside image (Dashboard links) */
+        .quick-nav {
+            background: white;
+            border-radius: 24px;
+            padding: 20px 24px;
+            border: 1px solid #e2edf8;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links span {
+            color: #2f618a;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 6px 0;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-links span.active {
+            border-bottom-color: #3680c9;
+            color: #1a4f7a;
+        }
+
+        .edit-profile-btn {
+            margin-left: auto;
+            background: #1b6bb0;
+            color: white;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* toast */
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #1e4e6f;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .toast.show { opacity: 1; }
+
+        /* responsive */
+        @media (max-width: 800px) {
+            .sidebar { width: 220px; }
+            .main-content { margin-left: 220px; padding: 25px; }
+            .stats-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 650px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 18px;
+            }
+            .sidebar ul { display: flex; flex-wrap: wrap; }
+            .sidebar li { padding: 10px 16px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .profile-card { flex-direction: column; gap: 20px; }
+            .quick-nav { flex-direction: column; align-items: stretch; }
+            .edit-profile-btn { margin-left: 0; }
+        }
+        
+        a{
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR exactly as in image: Dashboard, Edit Semester, Subject, Profile, Result -->
+<div class="sidebar">
+    <h2><i class="fas fa-user-graduate"></i> Profile</h2>
+    <ul>
+        <a href="index.html"> <li class="active"><i class="fas fa-home" style="text-decoration: none; color: inherit;"></i> Dashboard</li> </a>
+        <a href="result.html"><li><i class="fas fa-chart-bar" style="text-decoration: none; color: inherit;"></i> Result</li> </a>
+       <a href="ai-js-chart.html">  <li><i class="fas fa-pen" style="text-decoration: none; color: inherit;"></i> Edit Semester</li> </a>
+        <a href="course.html"> <li><i class="fas fa-book" style="text-decoration: none; color: inherit;"></i> Courses</li> </a>
+       <a href="student_change_password.html">  <li><i class="fas fa-user" style="text-decoration: none; color: inherit;"></i> Edit Password</li> </a>  
+    <a href="result.html"><li><i class="fas fa-chart-bar" style="text-decoration: none; color: inherit;"></i> Result</li> </a>
+    <a href="student_change_password.html">  <li><i class="fas fa-user" style="text-decoration: none; color: inherit;"></i> Edit Password</li> </a> 
+    </ul>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- top bar with logout -->
+    <div class="top-bar">
+        <div class="page-title">
+            <i class="fas fa-id-card"></i>
+            <h1>Profile</h1>
+        </div>
+        <a href="landing.html" class="logout-link" onclick="showToast('Logged out')" style="text-decoration: none; color: inherit;"><i class="fas fa-sign-out-alt"></i> logout</a>
+    </div>
+
+    <!-- profile card (avatar + details) -->
+    <div class="profile-card">
+        <div class="profile-avatar">
+            <div class="avatar-image">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <span class="avatar-edit" onclick="showToast('Change photo')"><i class="fas fa-camera"></i> edit</span>
+        </div>
+        <div class="profile-info">
+            <div class="info-field">
+                <div class="info-label"><i class="fas fa-user"></i> Full name</div>
+                <div class="info-value">Adamu Mouminih</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label"><i class="fas fa-id-card"></i> Student ID</div>
+                <div class="info-value">2024CS101</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label"><i class="fas fa-envelope"></i> Email</div>
+                <div class="info-value">adamu@gmail.com</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label"><i class="fas fa-phone"></i> Phone</div>
+                <div class="info-value">+237 652 244 621</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label"><i class="fas fa-calendar"></i> Enrollment</div>
+                <div class="info-value">Fall 2024</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label"><i class="fas fa-star"></i> Program</div>
+                <div class="info-value">Computer Science</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- three stat cards exactly like the uploaded image: Registered users, Total Classes Listed, Result Declared -->
+    <div class="stats-row">
+        <div class="stat-card" onclick="showToast('6 registered users')">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Registered Courses</div>
+            <div class="stat-sub"><i class="fas fa-user-plus"></i> total Courses</div>
+        </div>
+        <div class="stat-card" onclick="showToast('6 total classes listed')">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Total Classes Listed</div>
+            <div class="stat-sub"><i class="fas fa-school"></i> this semester</div>
+        </div>
+        <div class="stat-card" onclick="showToast('6 results declared')">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Result Declared</div>
+            <div class="stat-sub"><i class="fas fa-check-circle"></i> 6 published</div>
+        </div>
+    </div>
+
+    <!-- bottom navigation (Dashboard, Edit Semester, Subject, Profile, Result) exactly as image -->
+    <div class="quick-nav">
+        <div class="nav-links">
+          <a href="index.html" style="text-decoration: none; color: inherit;">  <span class="active" onclick="showToast('Dashboard')"><i class="fas fa-home"></i> Dashboard</span> </a>
+           <a href="ai-js-chart.html" style="text-decoration: none; color: inherit;"><span onclick="showToast('Edit Semester')"><i class="fas fa-pen"></i> Edit Semester</span> </a> 
+           <a href="course.html" style="text-decoration: none; color: inherit;"> <span onclick="showToast('Subject')"><i class="fas fa-book"></i> Course</span> </a>
+           <a href="profile.html" style="text-decoration: none; color: inherit;"> <span onclick="showToast('Profile')"><i class="fas fa-user"></i> Profile</span> </a>
+           <a href="result.html"style="text-decoration: none; color: inherit;"> <span onclick="showToast('Result')"><i class="fas fa-chart-bar"></i> Result</span> </a>
+        </div>
+        <button class="edit-profile-btn" onclick="showToast('Edit profile coming soon')">
+            <i class="fas fa-pencil-alt"></i> Edit Profile
+        </button>
+    </div>
+</div>
+
+<!-- toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = '👤 ' + msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // optional: mark active nav when clicked (simple UI feedback)
+    document.querySelectorAll('.nav-links span').forEach(link => {
+        link.addEventListener('click', function() {
+            document.querySelectorAll('.nav-links span').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>
